@@ -27,9 +27,10 @@ jobs:
     - name: Configure Go
       uses: actions/setup-go@v4
       with:
-        go-version-file: 'go.mod'
+        go-version: ">=1.21"
+        check-latest: true
     - name: Setup gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
+      uses: GoTestTools/gotestfmt-action@v2.1.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout code
