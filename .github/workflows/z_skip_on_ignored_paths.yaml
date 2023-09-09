@@ -1,0 +1,24 @@
+name: Skip on ignored paths
+on:
+  pull_request:
+    paths-ignore:
+      - '**.go'
+      - '**.tmpl'
+      - '.github/workflows/test.yaml'
+    branches:
+      - main
+  push:
+    paths-ignore:
+      - '**.go'
+      - '**.tmpl'
+      - '.github/workflows/test.yaml'
+    branches:
+      - main
+    tags-ignore:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No tests required" '

@@ -1,0 +1,57 @@
+on:
+  pull_request:
+    paths:
+      - '**.go'
+      - '**.tmpl'
+      - '.github/workflows/test.yaml'
+    branches:
+      - main
+  push:
+    paths:
+      - '**.go'
+      - '**.tmpl'
+      - '.github/workflows/test.yaml'
+    branches:
+      - main
+    tags-ignore:
+      - '**'
+  workflow_dispatch:
+
+name: Test
+jobs:
+  test:
+    permissions:
+      checks: write
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: 'go.mod'
+    - name: Setup gotestfmt
+      uses: GoTestTools/gotestfmt-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Run tests
+      run: |
+        set -euo pipefail
+        go test -race -json -v ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: ${{ !cancelled() }}
+      with:
+        name: test-log
+        path: /tmp/gotest.log
+        if-no-files-found: error
+    - name: Create JUnit XML test report
+      run: |
+        go install github.com/jstemmer/go-junit-report/v2@latest
+        go-junit-report -in /tmp/gotest.log -parser gojson -out /tmp/junit.xml
+      if: ${{ !cancelled() }}
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v4
+      if: ${{ !cancelled() }}
+      with:
+        report_paths: '/tmp/junit.xml'

@@ -1,0 +1,12 @@
+builds:
+  - binary: 'columbustogpx'
+    flags:
+      - '-trimpath'
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    goamd64:
+      - v3
